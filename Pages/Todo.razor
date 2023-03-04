@@ -1,0 +1,75 @@
+@page "/todo"
+@using todo_pilet;
+<div>
+    <h1>Todo: </h1>
+    <input id="todoItem" type="text" placeholder="What needs to be done?" @bind="@newTodo" style="width:60%"/>
+    <button @onclick="AddToDo"> + </button>
+    <br/>
+
+    <table>
+        <tr>
+
+            @foreach (progressStates state in Enum.GetValues(typeof(progressStates)))
+            {
+                <td style="padding: 15px">
+                    <input type='radio' name='radio' id="@state" @bind-value="@currentState" checked="@(currentState == state)" />
+                    <label for="@state">@state</label>
+                </td>
+             }
+
+        </tr>
+    </table>
+
+    <br/>
+    <div style="border:2px solid orange; width: 60%">
+        @foreach (ToDoItem todo in todos)
+        {
+            <input class="list-item complete-task" id="@todo.ID" type="checkbox" @bind-value="@todo.IsDone" />
+
+            if (!@todo.IsDone)
+            {
+                <label for="@todo.ID">@todo.Title</label>
+            }
+            else
+            {
+                <label for="@todo.ID" style="text-decoration: line-through"> @todo.Title </label>
+            }
+            <br />
+        }
+    </div>
+
+    <p>Items in list: @todos.Count </p>
+    @*<p>Items marked complete: @todos.Where(i => i.IsDone).Count()</p>*@
+
+    @*<p>Current count: @counter</p>
+    <p>
+        <button @onclick="Increment">Increment</button>
+    </p>*@
+</div>
+
+@code {
+#nullable enable
+    private List<ToDoItem> todos = new();
+    int counter = 0;
+    private string? newTodo;
+    private enum progressStates {All=0, InProgress=1, Complete=2};
+    private progressStates currentState = progressStates.All;
+
+    void Increment()
+    {
+        counter++;
+    }
+
+    void AddToDo() {
+        if (!string.IsNullOrWhiteSpace(newTodo)) {
+            todos.Add(new ToDoItem { Title = newTodo, ID = todos.Count });
+            newTodo = string.Empty;
+        }
+    }
+
+    void MarkDone() {
+        StateHasChanged();
+    }
+
+
+    }
